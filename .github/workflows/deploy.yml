@@ -4,10 +4,6 @@ on:
   push:
     branches: [ main ]
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   build-and-deploy:
     name: Build & Deploy to Azure App Service
@@ -29,16 +25,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements/production.txt
 
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_50C3A397348D47739306C56D05007A2B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_545BCF9829984806839604147EB03AF9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_63443BDADB8243A6B69F2334F001DCF7 }}
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME || 'clinic-booking-system' }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: '.'
           startup-command: 'gunicorn --bind=0.0.0.0 --timeout 600 config.wsgi:application'
