@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard — ClinicCare{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6">
+        <div>
+            <h1 class="text-3xl font-bold text-white">Welcome back, {{ patient.full_name }}! 👋</h1>
+            <p class="text-slate-400 mt-1">Manage your appointments, reschedule slots, or view consultation history.</p>
+        </div>
+        <div>
+            <a href="{% url 'frontend-book' %}" class="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                <span class="material-symbols-outlined">add_circle</span>
+                Book New Appointment
+            </a>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div>
+        <div class="flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-cyan-400">event_available</span>
+            <h2 class="text-xl font-bold text-white">Upcoming Appointments</h2>
+        </div>
+
+        {% if upcoming %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for appt in upcoming %}
+                    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 hover:border-cyan-500/50 transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    {{ appt.get_status_display }}
+                                </span>
+                                <span class="text-xs text-slate-400 font-mono">Slot: 30 mins</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-1">{{ appt.doctor.full_name }}</h3>
+                            <p class="text-sm text-cyan-400 mb-4">{{ appt.doctor.specialization }}</p>
+
+                            <div class="space-y-2 text-sm text-slate-300 bg-slate-900/60 rounded-xl p-4 mb-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-slate-400 text-base">calendar_today</span>
+                                    <span>{{ appt.appointment_date }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-slate-400 text-base">schedule</span>
+                                    <span>{{ appt.start_time|time:"H:i" }} – {{ appt.end_time|time:"H:i" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-700/50">
+                            <!-- Cancel Form -->
+                            <form action="{% url 'frontend-cancel' appt.id %}" method="POST" class="flex-1" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="reason" value="Cancelled by patient via portal">
+                                <button type="submit" class="w-full text-center text-sm font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 py-2 rounded-xl transition-all">
+                                    Cancel
+                                </button>
+                            </form>
+
+                            <!-- Reschedule Modal Trigger -->
+                            <button onclick="document.getElementById('reschedule-modal-{{ appt.id }}').showModal()" class="flex-1 text-center text-sm font-semibold bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-xl transition-all">
+                                Reschedule
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reschedule Dialog Modal -->
+                    <dialog id="reschedule-modal-{{ appt.id }}" class="bg-slate-900 text-white p-6 rounded-2xl border border-slate-700 shadow-2xl backdrop:bg-slate-950/80 max-w-md w-full">
+                        <h3 class="text-xl font-bold mb-4">Reschedule Appointment</h3>
+                        <p class="text-sm text-slate-400 mb-4">Select a new date and 30-min slot for {{ appt.doctor.full_name }}.</p>
+                        
+                        <form action="{% url 'frontend-reschedule' appt.id %}" method="POST" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">New Date</label>
+                                <input type="date" name="appointment_date" min="{{ today }}" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">New Time (e.g. 10:00, 14:30)</label>
+                                <input type="text" name="slot_time" placeholder="10:00" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white">
+                            </div>
+                            <div class="flex gap-3 pt-4">
+                                <button type="button" onclick="document.getElementById('reschedule-modal-{{ appt.id }}').close()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-xl font-semibold">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded-xl font-semibold">
+                                    Confirm New Slot
+                                </button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-slate-800/30 border border-slate-800 rounded-2xl p-8 text-center">
+                <span class="material-symbols-outlined text-slate-600 text-5xl mb-2">event_busy</span>
+                <p class="text-slate-400">You have no upcoming appointments scheduled.</p>
+                <a href="{% url 'frontend-book' %}" class="inline-block mt-4 text-cyan-400 font-semibold hover:underline">Book your first slot →</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Appointment History & Cancelled -->
+    {% if history %}
+        <div>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-slate-500">history</span>
+                <h2 class="text-xl font-bold text-white">History & Past Appointments</h2>
+            </div>
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-300">
+                        <thead class="bg-slate-900/60 text-slate-400 uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-4">Doctor</th>
+                                <th class="px-6 py-4">Date & Time</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Notes / Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            {% for appt in history %}
+                                <tr class="hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-4 font-semibold text-white">{{ appt.doctor.full_name }}</td>
+                                    <td class="px-6 py-4">{{ appt.appointment_date }} at {{ appt.start_time|time:"H:i" }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold {% if appt.status == 'cancelled' %}bg-red-500/10 text-red-400 border border-red-500/20{% else %}bg-slate-700 text-slate-300{% endif %}">
+                                            {{ appt.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-400">{{ appt.cancel_reason|default:"—" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
