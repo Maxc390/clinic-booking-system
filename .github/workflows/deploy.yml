@@ -31,4 +31,3 @@ jobs:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME || 'clinic-booking-system' }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: '.'
-          startup-command: 'gunicorn --bind=0.0.0.0 --timeout 600 config.wsgi:application'
