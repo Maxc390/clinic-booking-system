@@ -94,8 +94,10 @@ cp .env.example .env
 python manage.py makemigrations accounts doctors appointments
 python manage.py migrate
 
-# 6. Seed Initial 5 Doctors & Working Shift Schedules
+# 6. Seed Doctors, Working Hours & Demo Login Accounts
 python manage.py seed_doctors
+# Creates 5 doctors + 3 demo patients. All demo logins use password: demo1234
+# On the sign-in page you can click any demo user to log in instantly.
 
 # 7. Create Superuser (Admin Access)
 python manage.py createsuperuser
@@ -103,6 +105,21 @@ python manage.py createsuperuser
 # 8. Start Local Server
 python manage.py runserver
 ```
+
+### Demo Accounts (after `seed_doctors`)
+
+| Role | Username | Password | Notes |
+|---|---|---|---|
+| Patient | `patient.alice` | `demo1234` | Alice Wanjiku |
+| Patient | `patient.john` | `demo1234` | John Kamau |
+| Patient | `patient.grace` | `demo1234` | Grace Njeri |
+| Doctor | `dr.jenkins` | `demo1234` | General Practice |
+| Doctor | `dr.ochieng` | `demo1234` | Cardiology |
+| Doctor | `dr.hassan` | `demo1234` | Pediatrics |
+| Doctor | `dr.david` | `demo1234` | Emergency (nights) |
+| Doctor | `dr.elena` | `demo1234` | Dermatology |
+
+One-click demo login is controlled by `ALLOW_DEMO_LOGIN` (default `True`). Set to `False` to hide it.
 
 ### Running Unit Tests
 

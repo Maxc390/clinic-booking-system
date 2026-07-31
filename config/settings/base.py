@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.frontend.context_processors.role_flags',
             ],
         },
     },
@@ -147,3 +148,10 @@ REST_FRAMEWORK = {
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Demo click-to-login on the sign-in page (seed accounts only).
+# Set ALLOW_DEMO_LOGIN=False to hide one-click demo accounts in production.
+ALLOW_DEMO_LOGIN = config('ALLOW_DEMO_LOGIN', default=True, cast=bool)
+
+LOGIN_URL = 'frontend-index'
+LOGIN_REDIRECT_URL = 'frontend-dashboard'

@@ -3,7 +3,7 @@
 {% block title %}ClinicCare — Sign In or Register{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-12">
+<div class="max-w-5xl mx-auto py-12">
     <div class="text-center mb-12">
         <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent mb-4">
             Smart Healthcare Appointments
@@ -12,6 +12,100 @@
             Book 30-minute consultation slots with top medical specialists. Real-time availability, instant confirmation, and flexible rescheduling.
         </p>
     </div>
+
+    {% if allow_demo_login %}
+    <!-- Demo quick-login from seed data -->
+    <div class="mb-10 bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/20 rounded-2xl p-6 sm:p-8 shadow-xl shadow-cyan-900/10">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-amber-400 text-3xl">bolt</span>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Try a Demo Account</h2>
+                    <p class="text-sm text-slate-400">Click any user below to sign in instantly — no password typing needed.</p>
+                </div>
+            </div>
+            <div class="text-xs font-mono text-slate-400 bg-slate-950/60 border border-slate-700 rounded-lg px-3 py-2 self-start sm:self-auto">
+                password: <span class="text-amber-300">{{ demo_password }}</span>
+            </div>
+        </div>
+
+        {% if demo_patients or demo_doctors %}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Demo Patients -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-cyan-400 text-base">personal_injury</span>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300">Patients</h3>
+                    </div>
+                    {% if demo_patients %}
+                        <div class="space-y-2">
+                            {% for patient in demo_patients %}
+                            <form action="{% url 'frontend-demo-login' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="username" value="{{ patient.user.username }}">
+                                <button type="submit" class="w-full group flex items-center gap-3 text-left bg-slate-900/70 hover:bg-cyan-950/40 border border-slate-700 hover:border-cyan-500/50 rounded-xl px-4 py-3 transition-all">
+                                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-300 font-bold text-sm group-hover:bg-cyan-500/25">
+                                        {{ patient.user.first_name|first }}{{ patient.user.last_name|first }}
+                                    </span>
+                                    <span class="flex-1 min-w-0">
+                                        <span class="block font-semibold text-white truncate">{{ patient.full_name }}</span>
+                                        <span class="block text-xs text-slate-400 font-mono truncate">@{{ patient.user.username }}</span>
+                                    </span>
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-cyan-400 text-xl">login</span>
+                                </button>
+                            </form>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-sm text-slate-500 bg-slate-900/40 border border-dashed border-slate-700 rounded-xl p-4">
+                            No demo patients yet. Run <code class="text-cyan-400">python manage.py seed_doctors</code>
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Demo Doctors -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-violet-400 text-base">stethoscope</span>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300">Doctors</h3>
+                    </div>
+                    {% if demo_doctors %}
+                        <div class="space-y-2">
+                            {% for doctor in demo_doctors %}
+                            <form action="{% url 'frontend-demo-login' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="username" value="{{ doctor.user.username }}">
+                                <button type="submit" class="w-full group flex items-center gap-3 text-left bg-slate-900/70 hover:bg-violet-950/40 border border-slate-700 hover:border-violet-500/50 rounded-xl px-4 py-3 transition-all">
+                                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-violet-500/15 text-violet-300 font-bold text-sm group-hover:bg-violet-500/25">
+                                        {{ doctor.first_name|first }}{{ doctor.last_name|first }}
+                                    </span>
+                                    <span class="flex-1 min-w-0">
+                                        <span class="block font-semibold text-white truncate">{{ doctor.full_name }}</span>
+                                        <span class="block text-xs text-slate-400 truncate">{{ doctor.specialization }} · @{{ doctor.user.username }}</span>
+                                    </span>
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-violet-400 text-xl">login</span>
+                                </button>
+                            </form>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-sm text-slate-500 bg-slate-900/40 border border-dashed border-slate-700 rounded-xl p-4">
+                            No demo doctors yet. Run <code class="text-violet-400">python manage.py seed_doctors</code>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+                <span class="material-symbols-outlined text-amber-400">warning</span>
+                <div>
+                    <p class="font-semibold">Demo accounts not seeded yet</p>
+                    <p class="mt-1 text-amber-200/70">Run <code class="bg-slate-950/50 px-1.5 py-0.5 rounded">python manage.py seed_doctors</code> to create clickable patient and doctor logins.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Sign In Box -->
