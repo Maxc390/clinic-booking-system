@@ -72,9 +72,25 @@ class FrontendViewsTests(TestCase):
 
     def test_slot_picker_partial_htmx(self):
         url = reverse('frontend-slots-picker')
-        res = self.client.get(f"{url}?doctor_id={self.doctor.id}&date={self.future_date.strftime('%Y-%m-%d')}")
+        date_str = self.future_date.strftime('%Y-%m-%d')
+
+        # Alias used by direct/API-style calls
+        res = self.client.get(f"{url}?doctor_id={self.doctor.id}&date={date_str}")
         self.assertEqual(res.status_code, 200)
         self.assertContains(res, '10:00')
+
+        # Real book form + HTMX sends name="appointment_date" (not "date")
+        res_form = self.client.get(url, {
+            'doctor_id': str(self.doctor.id),
+            'appointment_date': date_str,
+        })
+        self.assertEqual(res_form.status_code, 200)
+        self.assertContains(res_form, '10:00')
+        self.assertNotContains(res_form, 'Select both doctor and date')
+
+        # Missing either param still shows the guidance message
+        res_missing = self.client.get(url, {'doctor_id': str(self.doctor.id)})
+        self.assertContains(res_missing, 'Select both doctor and date')
 
     def test_cancel_and_reschedule_frontend_actions(self):
         self.client.login(username='webuser', password='password123')

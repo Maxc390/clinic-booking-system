@@ -214,7 +214,8 @@ def book_view(request):
 
 def slot_picker_partial(request):
     doctor_id = request.GET.get('doctor_id')
-    date_str = request.GET.get('date')
+    # Book form field is named appointment_date; accept `date` as an alias for API/tests.
+    date_str = request.GET.get('appointment_date') or request.GET.get('date')
 
     if not doctor_id or not date_str:
         return render(request, 'frontend/partials/slots.html', {'slots': [], 'error': 'Select both doctor and date.'})
