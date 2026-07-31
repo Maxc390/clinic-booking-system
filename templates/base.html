@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClinicCare — Smart Clinic Booking{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <!-- HTMX CDN for modern dynamic interactions -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'frontend-index' %}" class="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                        <span class="material-symbols-outlined text-cyan-400 text-3xl">local_hospital</span>
+                        ClinicCare
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'frontend-dashboard' %}" class="flex items-center gap-1 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-base">dashboard</span>
+                            Dashboard
+                        </a>
+                        <a href="{% url 'frontend-book' %}" class="flex items-center gap-1 text-sm font-semibold bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-xl transition-all shadow-lg shadow-brand-600/20">
+                            <span class="material-symbols-outlined text-base">calendar_month</span>
+                            Book Appointment
+                        </a>
+                        <div class="h-4 w-px bg-slate-800"></div>
+                        <a href="{% url 'frontend-logout' %}" class="text-sm font-medium text-slate-400 hover:text-red-400 transition-colors">
+                            Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'frontend-index' %}" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                            Sign In / Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-4 rounded-xl flex items-center justify-between {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/20 text-red-300{% elif message.tags == 'success' %}bg-emerald-500/10 border border-emerald-500/20 text-emerald-300{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-300{% endif %}">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined">
+                            {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>© 2026 ClinicCare Booking System. Powered by Django REST Framework & Azure.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
