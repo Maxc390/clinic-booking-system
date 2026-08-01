@@ -6,7 +6,7 @@ A scalable, full-stack clinic appointment booking system built with **Django RES
 
 ## 🔗 Live Application & API
 
-- **Deployed Application URL**: `https://clinic-booking-system.azurewebsites.net`
+- **Deployed Application URL**: `https://clinic-booking-system-fscchsdneqd8ffbv.canadacentral-01.azurewebsites.net`
 - **Interactive API Documentation / Endpoints**:
   - `POST /api/appointments/` — Book a 30-minute slot
   - `GET /api/doctors/{id}/availability/` — View available 30-min slots for a doctor on a date
